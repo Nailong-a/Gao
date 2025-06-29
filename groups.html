@@ -65,6 +65,9 @@
             .message-bubble-right {
                 @apply bg-primary text-white rounded-tr-none;
             }
+            .loading-spinner {
+                @apply inline-block w-5 h-5 border-2 border-gray-200 border-t-primary rounded-full animate-spin;
+            }
         }
     </style>
 </head>
@@ -186,91 +189,7 @@
                 <!-- 推荐群组 -->
                 <div class="mb-10">
                     <h3 class="text-xl font-semibold mb-4">推荐加入的群组</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- 群组卡片 1 -->
-                        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 card-hover">
-                            <div class="p-5">
-                                <div class="flex items-center mb-4">
-                                    <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                                        <i class="fa fa-users text-primary text-xl"></i>
-                                    </div>
-                                    <div class="ml-4">
-                                        <h3 class="text-lg font-semibold">游戏交流群</h3>
-                                        <p class="text-gray-500 text-sm">
-                                            <span class="flex items-center">
-                                                <i class="fa fa-user-o mr-1"></i> 2,543 成员
-                                            </span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600 text-sm mb-4">
-                                    分享游戏经验和技巧，结交志同道合的游戏好友。
-                                </p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">策略交流</span>
-                                    <button class="btn-join join-btn" data-group-id="1" data-group-name="游戏交流群">
-                                        加入群组
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 群组卡片 2 -->
-                        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 card-hover">
-                            <div class="p-5">
-                                <div class="flex items-center mb-4">
-                                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-                                        <i class="fa fa-trophy text-red-500 text-xl"></i>
-                                    </div>
-                                    <div class="ml-4">
-                                        <h3 class="text-lg font-semibold">竞技对战群</h3>
-                                        <p class="text-gray-500 text-sm">
-                                            <span class="flex items-center">
-                                                <i class="fa fa-user-o mr-1"></i> 1,876 成员
-                                            </span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600 text-sm mb-4">
-                                    专注于游戏竞技对战，提升你的竞技水平。
-                                </p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">竞技对战</span>
-                                    <button class="btn-join join-btn" data-group-id="2" data-group-name="竞技对战群">
-                                        加入群组
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 群组卡片 3 -->
-                        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 card-hover">
-                            <div class="p-5">
-                                <div class="flex items-center mb-4">
-                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <i class="fa fa-gamepad text-green-500 text-xl"></i>
-                                    </div>
-                                    <div class="ml-4">
-                                        <h3 class="text-lg font-semibold">休闲娱乐群</h3>
-                                        <p class="text-gray-500 text-sm">
-                                            <span class="flex items-center">
-                                                <i class="fa fa-user-o mr-1"></i> 3,128 成员
-                                            </span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="text-gray-600 text-sm mb-4">
-                                    轻松休闲的游戏氛围，适合喜欢轻松游戏的玩家。
-                                </p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">休闲娱乐</span>
-                                    <button class="btn-join join-btn" data-group-id="3" data-group-name="休闲娱乐群">
-                                        加入群组
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- 移除了群组卡片 -->
                 </div>
 
                 <!-- 创建群组按钮 -->
@@ -441,8 +360,11 @@
                     <button type="button" id="cancel-create-group" class="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors">
                         取消
                     </button>
-                    <button type="submit" class="w-1/2 bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all">
-                        创建群组
+                    <button type="submit" id="submit-create-group" class="w-1/2 bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all">
+                        <span id="submit-button-text">创建群组</span>
+                        <span id="submit-spinner" class="hidden ml-2">
+                            <i class="fa fa-circle-o-notch fa-spin"></i>
+                        </span>
                     </button>
                 </div>
             </form>
@@ -521,53 +443,6 @@
             document.body.classList.remove('overflow-hidden');
         });
         
-        // 加入群组功能
-        document.querySelectorAll('.join-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const groupId = this.getAttribute('data-group-id');
-                const groupName = this.getAttribute('data-group-name');
-                
-                // 显示加载状态
-                this.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 加入中...';
-                this.disabled = true;
-                
-                // 模拟API请求延迟
-                setTimeout(() => {
-                    // 显示成功消息
-                    this.classList.remove('btn-join');
-                    this.classList.add('btn-joined');
-                    this.innerHTML = '<i class="fa fa-check mr-2"></i> 已加入';
-                    
-                    // 显示通知
-                    showNotification(`已成功加入群组 "${groupName}"`);
-                    
-                    // 保存已加入状态
-                    let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
-                    if (!myGroups.some(group => group.id === groupId)) {
-                        myGroups.push({
-                            id: groupId,
-                            name: groupName,
-                            members: Math.floor(Math.random() * 5000),
-                            lastMessage: '快来和大家一起聊天吧！',
-                            lastMessageTime: new Date().toISOString()
-                        });
-                        localStorage.setItem('myGroups', JSON.stringify(myGroups));
-                    }
-                }, 1000);
-            });
-            
-            // 检查是否已加入该群组
-            const groupId = button.getAttribute('data-group-id');
-            const groupName = button.getAttribute('data-group-name');
-            let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
-            if (myGroups.some(group => group.id === groupId)) {
-                button.classList.remove('btn-join');
-                button.classList.add('btn-joined');
-                button.innerHTML = '<i class="fa fa-check mr-2"></i> 已加入';
-                button.disabled = true;
-            }
-        });
-        
         // 更新我的群组列表 - 修复闭包问题
         function updateMyGroupsList() {
             const myGroupsList = document.getElementById('my-groups-list');
@@ -604,7 +479,7 @@
                     </div>
                 `;
                 
-                // 修复闭包问题 - 使用箭头函数和立即执行函数
+                // 修复闭包问题 - 使用箭头函数
                 groupEl.addEventListener('click', () => {
                     // 先关闭侧边栏
                     myGroupsSidebar.classList.add('-translate-x-full');
@@ -673,181 +548,54 @@
         
         // 发送聊天消息
         sendChatMessageBtn.addEventListener('click', () => {
-            sendMessage();
-        });
-        
-        // 回车发送消息
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-        
-        // 发送消息函数
-        function sendMessage() {
             const message = chatInput.value.trim();
             if (message === '') return;
             
-            // 获取当前活跃的群组名称
-            const groupName = chatGroupName.textContent;
-            let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
-            const activeGroup = myGroups.find(group => group.name === groupName);
+            // 添加消息到界面
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message-bubble message-bubble-right';
+            messageElement.textContent = message;
             
-            if (activeGroup) {
-                // 更新最后一条消息
-                activeGroup.lastMessage = message;
-                activeGroup.lastMessageTime = new Date().toISOString();
-                localStorage.setItem('myGroups', JSON.stringify(myGroups));
-                
-                // 添加消息到聊天窗口
-                addMessageToChat('right', '奶龙', message);
-                
-                // 模拟回复
-                setTimeout(() => {
-                    const replies = [
-                        '哈哈，这个游戏真不错！',
-                        '我也很喜欢这个英雄的玩法',
-                        '有没有人一起组队啊？',
-                        '明天有比赛，大家准备好！',
-                        '这个策略很有意思，值得尝试'
-                    ];
-                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                    addMessageToChat('left', '玩家' + Math.floor(Math.random() * 1000), randomReply);
-                    
-                    // 更新最后一条消息
-                    activeGroup.lastMessage = randomReply;
-                    activeGroup.lastMessageTime = new Date().toISOString();
-                    localStorage.setItem('myGroups', JSON.stringify(myGroups));
-                    
-                    // 更新我的群组列表中的最后一条消息
-                    updateMyGroupsList();
-                }, 1000);
-            }
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
             
             // 清空输入框
             chatInput.value = '';
-        }
-        
-        // 添加消息到聊天窗口
-        function addMessageToChat(side, username, message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `flex ${side === 'right' ? 'justify-end' : 'justify-start'}`;
             
-            // 生成头像颜色
-            const colors = ['blue', 'green', 'purple', 'red', 'orange', 'indigo', 'pink'];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            // 模拟发送到服务器
+            console.log(`发送消息到群组: ${chatGroupName.textContent}, 内容: ${message}`);
             
-            // 生成首字母
-            const firstChar = username.charAt(0).toUpperCase();
+            // 更新最后一条消息
+            const myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
+            const groupIndex = myGroups.findIndex(g => g.name === chatGroupName.textContent);
+            if (groupIndex !== -1) {
+                myGroups[groupIndex].lastMessage = message;
+                myGroups[groupIndex].lastMessageTime = new Date().toISOString();
+                localStorage.setItem('myGroups', JSON.stringify(myGroups));
+            }
             
-            messageDiv.innerHTML = `
-                <div class="message-bubble ${side === 'right' ? 'message-bubble-right' : 'message-bubble-left'}">
-                    ${side === 'left' ? `
-                        <div class="flex items-center mb-1">
-                            <div class="w-6 h-6 rounded-full bg-${randomColor}-500 text-white flex items-center justify-center text-xs mr-2">
-                                ${firstChar}
-                            </div>
-                            <span class="text-xs font-medium">${username}</span>
-                        </div>
-                    ` : ''}
-                    <p>${message}</p>
-                    ${side === 'right' ? `
-                        <div class="text-right mt-1">
-                            <span class="text-xs text-white/80">刚刚</span>
-                        </div>
-                    ` : `
-                        <div class="text-right mt-1">
-                            <span class="text-xs text-gray-500">刚刚</span>
-                        </div>
-                    `}
-                </div>
-            `;
-            
-            chatMessages.appendChild(messageDiv);
-            
-            // 滚动到底部
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        
-        // 显示聊天消息
-        function displayChatMessages(groupId) {
-            // 清空聊天窗口
-            chatMessages.innerHTML = '';
-            
-            // 模拟一些历史消息
-            const messageCount = Math.floor(Math.random() * 5) + 1;
-            const usernames = ['玩家1', '玩家2', '玩家3', '玩家4', '玩家5'];
-            const messages = [
-                '大家好，欢迎加入这个群组！',
-                '有人一起组队玩吗？',
-                '这个游戏的新英雄太强了！',
-                '请问这个副本怎么打？',
-                '明天有活动，记得参加哦！',
-                '我觉得这个策略很不错',
-                '有人知道下个版本更新什么吗？'
-            ];
-            
-            for (let i = 0; i < messageCount; i++) {
-                const username = usernames[Math.floor(Math.random() * usernames.length)];
-                const message = messages[Math.floor(Math.random() * messages.length)];
-                const side = i % 2 === 0 ? 'left' : 'right';
+            // 模拟服务器回复
+            setTimeout(() => {
+                const replyElement = document.createElement('div');
+                replyElement.className = 'message-bubble message-bubble-left';
+                replyElement.innerHTML = `<div class="font-medium text-gray-900">系统</div>${message}`;
                 
-                // 随机延迟添加消息，模拟聊天过程
-                setTimeout(() => {
-                    addMessageToChat(side, username, message);
-                }, i * 200);
-            }
-        }
-        
-        // 格式化时间
-        function formatTimeAgo(timestamp) {
-            const now = new Date();
-            const date = new Date(timestamp);
-            const diff = now - date;
-            
-            if (diff < 60000) { // 不到1分钟
-                return '刚刚';
-            } else if (diff < 3600000) { // 不到1小时
-                return Math.floor(diff / 60000) + '分钟前';
-            } else if (diff < 86400000) { // 不到1天
-                return Math.floor(diff / 3600000) + '小时前';
-            } else {
-                return date.getMonth() + 1 + '月' + date.getDate() + '日';
-            }
-        }
-        
-        // 显示通知
-        function showNotification(message) {
-            // 创建通知元素
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-500 z-50';
-            notification.textContent = message;
-            
-            // 添加到页面
-            document.body.appendChild(notification);
-            
-            // 显示通知
-            setTimeout(() => {
-                notification.classList.remove('translate-y-10', 'opacity-0');
-            }, 100);
-            
-            // 3秒后隐藏通知
-            setTimeout(() => {
-                notification.classList.add('translate-y-10', 'opacity-0');
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 500);
-            }, 3000);
-        }
-        
-        // 创建群组功能
-        const createGroupBtn = document.getElementById('create-group-btn');
-        const createGroupBtnSidebar = document.getElementById('create-group-btn-sidebar');
+                chatMessages.appendChild(replyElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+        });
+
+        // 创建群组模态框
         const createGroupModal = document.getElementById('create-group-modal');
         const createModalContent = document.getElementById('create-modal-content');
+        const createGroupBtn = document.getElementById('create-group-btn');
+        const createGroupBtnSidebar = document.getElementById('create-group-btn-sidebar');
         const closeCreateModalBtn = document.getElementById('close-create-modal');
         const cancelCreateGroupBtn = document.getElementById('cancel-create-group');
         const createGroupForm = document.getElementById('create-group-form');
+        const submitCreateGroupBtn = document.getElementById('submit-create-group');
+        const submitButtonText = document.getElementById('submit-button-text');
+        const submitSpinner = document.getElementById('submit-spinner');
         
         function openCreateGroupModal() {
             createGroupModal.classList.remove('hidden');
@@ -875,70 +623,140 @@
         closeCreateModalBtn.addEventListener('click', closeCreateGroupModal);
         cancelCreateGroupBtn.addEventListener('click', closeCreateGroupModal);
         
-        // 处理创建群组表单提交
-        createGroupForm.addEventListener('submit', (e) => {
+        // 创建群组表单提交处理
+        createGroupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const groupName = document.getElementById('group-name').value;
-            const categoryElements = document.getElementsByName('category');
-            let category = '';
+            // 验证表单数据
+            const groupName = document.getElementById('group-name').value.trim();
+            if (!groupName) {
+                showNotification('请输入群组名称');
+                return;
+            }
             
+            const categoryElements = document.getElementsByName('category');
+            let categorySelected = false;
             for (const el of categoryElements) {
                 if (el.checked) {
-                    category = el.value;
+                    categorySelected = true;
                     break;
                 }
             }
+            if (!categorySelected) {
+                showNotification('请选择群组类别');
+                return;
+            }
             
-            const groupDescription = document.getElementById('group-description').value;
-            const groupType = document.querySelector('input[name="group-type"]:checked').value;
+            const groupDescription = document.getElementById('group-description').value.trim();
+            if (!groupDescription) {
+                showNotification('请输入群组描述');
+                return;
+            }
             
             // 显示加载状态
-            const submitButton = createGroupForm.querySelector('button[type="submit"]');
-            submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 创建中...';
-            submitButton.disabled = true;
+            submitButtonText.textContent = '创建中...';
+            submitSpinner.classList.remove('hidden');
+            submitCreateGroupBtn.disabled = true;
             
-            // 模拟API请求延迟
-            setTimeout(() => {
-                // 创建新群组
-                const newGroup = {
-                    id: Date.now().toString(),
+            try {
+                // 获取表单数据
+                const category = Array.from(categoryElements).find(el => el.checked).value;
+                const groupType = Array.from(document.getElementsByName('group-type')).find(el => el.checked).value;
+                
+                // 构建请求数据
+                const groupData = {
+                    id: Date.now().toString(), // 生成唯一ID
                     name: groupName,
-                    members: 1, // 创建者本人
-                    lastMessage: '群组已创建',
-                    lastMessageTime: new Date().toISOString(),
                     category: category,
                     description: groupDescription,
-                    type: groupType
+                    type: groupType,
+                    creatorId: 'user123', // 示例用户ID，实际应从会话中获取
+                    createdAt: new Date().toISOString(),
+                    members: 1, // 创建者自己
+                    lastMessage: '欢迎加入群组！',
+                    lastMessageTime: new Date().toISOString()
                 };
                 
-                // 保存到localStorage
-                let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
-                myGroups.push(newGroup);
+                // 模拟API调用 - 使用localStorage代替真实API
+                // 实际应用中，这里应该有API调用将数据发送到服务器
+                // 模拟延迟
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // 更新我的群组列表
+                const myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
+                myGroups.push(groupData);
                 localStorage.setItem('myGroups', JSON.stringify(myGroups));
+                
+                // 成功创建群组后处理
+                showNotification('群组创建成功！');
                 
                 // 关闭模态框
                 closeCreateGroupModal();
                 
-                // 显示成功通知
-                showNotification(`群组 "${groupName}" 创建成功！`);
-                
-                // 更新我的群组列表
-                updateMyGroupsList();
-                
                 // 重置表单
                 createGroupForm.reset();
                 
-                // 恢复按钮状态
+                // 刷新我的群组列表
+                updateMyGroupsList();
+                
+                // 自动打开新创建的群组聊天窗口
                 setTimeout(() => {
-                    submitButton.innerHTML = '创建群组';
-                    submitButton.disabled = false;
-                }, 300);
-            }, 1500);
+                    openChatModal(groupData);
+                }, 500);
+                
+            } catch (error) {
+                console.error('创建群组失败:', error);
+                showNotification('创建群组失败，请重试');
+            } finally {
+                // 恢复按钮状态
+                submitButtonText.textContent = '创建群组';
+                submitSpinner.classList.add('hidden');
+                submitCreateGroupBtn.disabled = false;
+            }
         });
-        
-        // 初始化我的群组列表
-        updateMyGroupsList();
+
+        // 辅助函数
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const messageDate = new Date(timestamp);
+            const diff = now - messageDate;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (minutes < 1) {
+                return '刚刚';
+            } else if (minutes < 60) {
+                return `${minutes} 分钟前`;
+            } else if (hours < 24) {
+                return `${hours} 小时前`;
+            } else {
+                return `${days} 天前`;
+            }
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-primary text-white p-3 rounded-lg shadow-md z-50';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function displayChatMessages(groupId) {
+            // 假设这里有获取聊天消息的逻辑
+            chatMessages.innerHTML = `
+                <div class="flex items-center justify-center h-full">
+                    <div class="text-center text-gray-500">
+                        <i class="fa fa-comments-o text-4xl mb-3"></i>
+                        <p>开始与群组成员聊天</p>
+                    </div>
+                </div>
+            `;
+        }
     </script>
 </body>
-</html>    
+</html>
