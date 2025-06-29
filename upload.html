@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高能英雄游戏社区 - 内容上传</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#F97316',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-glass {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark">
+    <!-- 导航栏 -->
+    <header class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="bg-glass border-b border-gray-200/30">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <div class="flex items-center">
+                        <a href="index.html" class="flex items-center">
+                            <span class="text-primary text-2xl font-bold">高能英雄</span>
+                            <span class="ml-1 text-secondary text-xl">社区</span>
+                        </a>
+                    </div>
+                    
+                    <!-- 导航链接 - 桌面版 -->
+                    <nav class="hidden md:flex space-x-8">
+                        <a href="index.html" class="text-gray-900 hover:text-primary px-3 py-2 text-sm font-medium transition-colors">首页</a>
+                        <a href="groups.html" class="text-gray-900 hover:text-primary px-3 py-2 text-sm font-medium transition-colors">游戏群组</a>
+                        <a href="upload.html" class="text-primary border-b-2 border-primary px-3 py-2 text-sm font-medium">内容上传</a>
+                    </nav>
+                    
+                    <!-- 用户区域 -->
+                    <div class="flex items-center space-x-4">
+                        <a href="profile.html" class="hidden md:flex items-center space-x-2">
+                            <img src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
+                            <span class="text-sm font-medium">奶龙</span>
+                        </a>
+                        
+                        <!-- 移动端菜单按钮 -->
+                        <button id="mobile-menu-button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 focus:outline-none">
+                            <i class="fa fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">首页</a>
+                <a href="groups.html" class="text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">游戏群组</a>
+                <a href="upload.html" class="text-primary font-medium block px-3 py-2 text-base">内容上传</a>
+                <a href="profile.html" class="text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">
+                    <div class="flex items-center space-x-2">
+                        <img src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
+                        <span>奶龙</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="pt-20 pb-12">
+        <!-- 面包屑导航 -->
+        <section class="bg-gray-100 py-4">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex" aria-label="面包屑">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <li class="inline-flex items-center">
+                            <a href="index.html" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary">
+                                <i class="fa fa-home mr-2"></i>首页
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <i class="fa fa-angle-right text-gray-400 mx-2"></i>
+                                <a href="#" class="text-sm font-medium text-gray-700 hover:text-primary">内容中心</a>
+                            </div>
+                        </li>
+                        <li aria-current="page">
+                            <div class="flex items-center">
+                                <i class="fa fa-angle-right text-gray-400 mx-2"></i>
+                                <span class="text-sm font-medium text-primary">内容上传</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </section>
+
+        <!-- 内容上传表单 -->
+        <section class="py-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-8">
+                        <h2 class="text-2xl md:text-3xl font-bold mb-6">上传你的内容</h2>
+                        
+                        <form id="upload-form" class="space-y-6">
+                            <!-- 内容类型 -->
+                            <div>
+                                <label for="content-type" class="block text-sm font-medium text-gray-700 mb-2">内容类型</label>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="relative">
+                                        <input type="radio" id="type-guide" name="content-type" value="guide" class="peer sr-only" required>
+                                        <label for="type-guide" class="flex items-center justify-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                            <div class="flex flex-col items-center">
+                                                <i class="fa fa-book text-2xl mb-2 text-gray-500 peer-checked:text-primary"></i>
+                                                <span class="text-sm font-medium">攻略</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="relative">
+                                        <input type="radio" id="type-video" name="content-type" value="video" class="peer sr-only" required>
+                                        <label for="type-video" class="flex items-center justify-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                            <div class="flex flex-col items-center">
+                                                <i class="fa fa-video-camera text-2xl mb-2 text-gray-500 peer-checked:text-primary"></i>
+                                                <span class="text-sm font-medium">视频</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="relative">
+                                        <input type="radio" id="type-image" name="content-type" value="image" class="peer sr-only" required>
+                                        <label for="type-image" class="flex items-center justify-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                            <div class="flex flex-col items-center">
+                                                <i class="fa fa-picture-o text-2xl mb-2 text-gray-500 peer-checked:text-primary"></i>
+                                                <span class="text-sm font-medium">图片</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 标题 -->
+                            <div>
+                                <label for="title" class="block text-sm font-medium text-gray-700 mb-2">标题</label>
+                                <input type="text" id="title" name="title" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" required>
+                            </div>
+
+                            <!-- 描述 -->
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+                                <textarea id="description" name="description" rows="4" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" required></textarea>
+                            </div>
+
+                            <!-- 文件上传 -->
+                            <div>
+                                <label for="file" class="block text-sm font-medium text-gray-700 mb-2">选择文件</label>
+                                <div class="relative">
+                                    <input type="file" id="file" name="file" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary cursor-pointer" required>
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-paperclip text-gray-500"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 提交按钮 -->
+                            <div>
+                                <button type="submit" class="bg-primary hover:bg-primary/90 text-white font-medium py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 w-full md:w-auto">
+                                    <i class="fa fa-upload mr-2"></i>上传内容
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 上传提示 -->
+        <section class="py-8">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">
+                        <i class="fa fa-info-circle mr-2"></i>上传须知
+                    </h3>
+                    <ul class="space-y-2 text-blue-700">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span>请上传与《高能英雄》游戏相关的内容</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span>攻略类内容需确保信息准确，避免误导其他玩家</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span>视频/图片内容需清晰可辨，无水印和第三方广告</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span>上传内容需遵守社区规则，禁止包含违规信息</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span>我们将在24小时内审核你的内容，审核通过后将显示在社区中</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-12 pb-6">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">高能英雄社区</h3>
+                    <p class="text-gray-400 mb-4">
+                        为高能英雄玩家打造的专业社区，分享游戏经验，结交游戏好友。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-wechat text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-qq text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-youtube-play text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">快速链接</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                        <li><a href="groups.html" class="text-gray-400 hover:text-white transition-colors">游戏群组</a></li>
+                        <li><a href="upload.html" class="text-gray-400 hover:text-white transition-colors">内容上传</a></li>
+                        <li><a href="profile.html" class="text-gray-400 hover:text-white transition-colors">个人中心</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">支持</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">帮助中心</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">社区规则</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">举报问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">联系我们</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">订阅最新资讯</h4>
+                    <p class="text-gray-400 mb-4">输入你的邮箱，获取最新游戏资讯和社区活动</p>
+                    <form class="flex">
+                        <input type="email" placeholder="你的邮箱地址" class="px-4 py-2 rounded-l-lg w-full focus:outline-none text-dark">
+                        <button type="submit" class="bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-r-lg">订阅</button>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center text-gray-400">
+                &copy; 2024 高能英雄游戏社区. 保留所有权利.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 移动端菜单切换
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-white', 'shadow-md');
+                navbar.classList.remove('bg-glass');
+            } else {
+                navbar.classList.remove('bg-white', 'shadow-md');
+                navbar.classList.add('bg-glass');
+            }
+        });
+        
+        // 表单提交处理
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 获取表单数据
+            const formData = new FormData(this);
+            
+            // 这里可以添加AJAX请求代码将数据发送到服务器
+            console.log('表单提交成功，数据:', formData);
+            
+            // 显示上传成功消息
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg z-50 transform transition-all duration-500 translate-x-full';
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fa fa-check-circle mr-2"></i>
+                    <span>内容上传成功！我们将尽快审核你的内容。</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            // 显示通知
+            setTimeout(() => {
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // 3秒后隐藏通知
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+            
+            this.reset(); // 重置表单
+        });
+        
+        // 文件上传预览功能
+        document.getElementById('file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileName = file.name;
+                // 这里可以添加文件预览功能
+                console.log('选择的文件:', fileName);
+            }
+        });
+    </script>
+</body>
+</html>

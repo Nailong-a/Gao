@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高能英雄游戏社区</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#F97316',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .bg-glass {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+            .btn-join {
+                @apply bg-primary hover:bg-primary/90 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors;
+            }
+            .btn-joined {
+                @apply bg-gray-200 text-gray-600 text-sm font-medium py-2 px-4 rounded-lg cursor-not-allowed;
+            }
+            .message-bubble {
+                @apply rounded-lg p-3 my-2 max-w-[80%] break-words;
+            }
+            .message-bubble-left {
+                @apply bg-gray-100 text-gray-800 rounded-tl-none;
+            }
+            .message-bubble-right {
+                @apply bg-primary text-white rounded-tr-none;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark">
+    <!-- 导航栏 -->
+    <header class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="bg-glass border-b border-gray-200/30">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo -->
+                    <div class="flex items-center">
+                        <a href="index.html" class="flex items-center">
+                            <span class="text-primary text-2xl font-bold">高能英雄</span>
+                            <span class="ml-1 text-secondary text-xl">社区</span>
+                        </a>
+                    </div>
+                    
+                    <!-- 导航链接 - 桌面版 -->
+                    <nav class="hidden md:flex space-x-8">
+                        <a href="index.html" class="text-gray-900 hover:text-primary px-3 py-2 text-sm font-medium transition-colors">首页</a>
+                        <a href="groups.html" class="text-primary border-b-2 border-primary px-3 py-2 text-sm font-medium">游戏群组</a>
+                        <a href="upload.html" class="text-gray-900 hover:text-primary px-3 py-2 text-sm font-medium transition-colors">内容上传</a>
+                    </nav>
+                    
+                    <!-- 用户区域 -->
+                    <div class="flex items-center space-x-4">
+                        <button id="show-my-groups" class="hidden md:flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fa fa-users text-primary"></i>
+                            <span class="text-sm font-medium">我的群组</span>
+                        </button>
+                        <a href="profile.html" class="hidden md:flex items-center space-x-2">
+                            <img src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
+                            <span class="text-sm font-medium">奶龙</span>
+                        </a>
+                        
+                        <!-- 移动端菜单按钮 -->
+                        <button id="mobile-menu-button" class="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary hover:bg-gray-100 focus:outline-none">
+                            <i class="fa fa-bars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-gray-200">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">首页</a>
+                <a href="groups.html" class="text-primary font-medium block px-3 py-2 text-base">游戏群组</a>
+                <a href="upload.html" class="text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">内容上传</a>
+                <button id="mobile-show-my-groups" class="w-full text-left text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">
+                    <i class="fa fa-users mr-2"></i>我的群组
+                </button>
+                <a href="profile.html" class="text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">
+                    <div class="flex items-center space-x-2">
+                        <img src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
+                        <span>奶龙</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="pt-20 pb-12">
+        <!-- 面包屑导航 -->
+        <section class="bg-gray-100 py-4">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex" aria-label="面包屑">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                        <li class="inline-flex items-center">
+                            <a href="index.html" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary">
+                                <i class="fa fa-home mr-2"></i>首页
+                            </a>
+                        </li>
+                        <li aria-current="page">
+                            <div class="flex items-center">
+                                <i class="fa fa-angle-right text-gray-400 mx-2"></i>
+                                <span class="text-sm font-medium text-primary">游戏群组</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </section>
+
+        <!-- 群组列表区域 -->
+        <section class="py-12">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">发现群组</h2>
+                        <p class="text-gray-600">加入感兴趣的群组，结交志同道合的游戏好友</p>
+                    </div>
+                    
+                    <div class="mt-4 md:mt-0 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full md:w-auto">
+                        <div class="relative">
+                            <input type="text" placeholder="搜索群组..." class="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition-all">
+                            <i class="fa fa-search absolute right-3 top-3 text-gray-400"></i>
+                        </div>
+                        
+                        <select class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition-all">
+                            <option value="">全部类别</option>
+                            <option value="strategy">策略交流</option>
+                            <option value="pvp">竞技对战</option>
+                            <option value="casual">休闲娱乐</option>
+                            <option value="tournament">赛事组织</option>
+                            <option value="newplayer">新手指导</option>
+                        </select>
+                        
+                        <select class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition-all">
+                            <option value="popular">热门程度</option>
+                            <option value="newest">最新创建</option>
+                            <option value="active">活跃程度</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 推荐群组 -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-semibold mb-4">推荐加入的群组</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- 群组卡片 1 -->
+                        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 card-hover">
+                            <div class="p-5">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-users text-primary text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg font-semibold">游戏交流群</h3>
+                                        <p class="text-gray-500 text-sm">
+                                            <span class="flex items-center">
+                                                <i class="fa fa-user-o mr-1"></i> 2,543 成员
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">
+                                    分享游戏经验和技巧，结交志同道合的游戏好友。
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">策略交流</span>
+                                    <button class="btn-join join-btn" data-group-id="1" data-group-name="游戏交流群">
+                                        加入群组
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 群组卡片 2 -->
+                        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 card-hover">
+                            <div class="p-5">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-trophy text-red-500 text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg font-semibold">竞技对战群</h3>
+                                        <p class="text-gray-500 text-sm">
+                                            <span class="flex items-center">
+                                                <i class="fa fa-user-o mr-1"></i> 1,876 成员
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">
+                                    专注于游戏竞技对战，提升你的竞技水平。
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">竞技对战</span>
+                                    <button class="btn-join join-btn" data-group-id="2" data-group-name="竞技对战群">
+                                        加入群组
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 群组卡片 3 -->
+                        <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 card-hover">
+                            <div class="p-5">
+                                <div class="flex items-center mb-4">
+                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fa fa-gamepad text-green-500 text-xl"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <h3 class="text-lg font-semibold">休闲娱乐群</h3>
+                                        <p class="text-gray-500 text-sm">
+                                            <span class="flex items-center">
+                                                <i class="fa fa-user-o mr-1"></i> 3,128 成员
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 text-sm mb-4">
+                                    轻松休闲的游戏氛围，适合喜欢轻松游戏的玩家。
+                                </p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">休闲娱乐</span>
+                                    <button class="btn-join join-btn" data-group-id="3" data-group-name="休闲娱乐群">
+                                        加入群组
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 创建群组按钮 -->
+                <div class="mt-10 text-center">
+                    <button id="create-group-btn" class="bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex items-center mx-auto">
+                        <i class="fa fa-plus-circle mr-2"></i> 创建新群组
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 我的群组侧边栏 -->
+    <div id="my-groups-sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:w-80 w-full bg-white shadow-xl z-40 transition-transform duration-300 ease-in-out">
+        <div class="h-full flex flex-col">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-xl font-bold">我的群组</h3>
+                <button id="close-my-groups" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4" id="my-groups-list">
+                <!-- 我的群组将通过JavaScript动态添加 -->
+                <div class="text-center text-gray-500 py-8">
+                    <i class="fa fa-folder-open-o text-4xl mb-3"></i>
+                    <p>您还没有加入任何群组</p>
+                    <p class="text-sm">加入或创建群组开始聊天</p>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-gray-200">
+                <button id="create-group-btn-sidebar" class="w-full bg-secondary hover:bg-secondary/90 text-white font-medium py-2.5 px-4 rounded-lg transition-colors">
+                    <i class="fa fa-plus-circle mr-2"></i> 创建新群组
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 遮罩层 -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+    <!-- 聊天模态框 -->
+    <div id="chat-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl h-[80vh] max-w-4xl w-full mx-4 flex flex-col transform transition-all duration-300 scale-95 opacity-0" id="chat-modal-content">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                        <i class="fa fa-users text-primary"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold" id="chat-group-name">游戏交流群</h3>
+                        <p class="text-xs text-gray-500" id="chat-group-members">2,543 成员</p>
+                    </div>
+                </div>
+                <button id="close-chat-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-4" id="chat-messages">
+                <!-- 聊天消息将通过JavaScript动态添加 -->
+                <div class="flex items-center justify-center h-full">
+                    <div class="text-center text-gray-500">
+                        <i class="fa fa-comments-o text-4xl mb-3"></i>
+                        <p>开始与群组成员聊天</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex items-center">
+                    <input type="text" id="chat-input" placeholder="输入消息..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary mr-2">
+                    <button id="send-chat-message" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建群聊模态框 -->
+    <div id="create-group-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 max-w-2xl w-full mx-4 transform transition-all duration-300 scale-95 opacity-0" id="create-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">创建新群组</h2>
+                <button id="close-create-modal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="create-group-form" class="space-y-6">
+                <!-- 群组名称 -->
+                <div>
+                    <label for="group-name" class="block text-sm font-medium text-gray-700 mb-2">群组名称</label>
+                    <input type="text" id="group-name" name="group-name" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" placeholder="请输入群组名称" required>
+                </div>
+                
+                <!-- 群组类别 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">群组类别</label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        <div class="relative">
+                            <input type="radio" id="category-strategy" name="category" value="strategy" class="peer sr-only" required>
+                            <label for="category-strategy" class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                <i class="fa fa-book text-primary mr-3"></i>
+                                <span>策略交流</span>
+                            </label>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="radio" id="category-pvp" name="category" value="pvp" class="peer sr-only" required>
+                            <label for="category-pvp" class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                <i class="fa fa-trophy text-primary mr-3"></i>
+                                <span>竞技对战</span>
+                            </label>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="radio" id="category-casual" name="category" value="casual" class="peer sr-only" required>
+                            <label for="category-casual" class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                <i class="fa fa-gamepad text-primary mr-3"></i>
+                                <span>休闲娱乐</span>
+                            </label>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="radio" id="category-tournament" name="category" value="tournament" class="peer sr-only" required>
+                            <label for="category-tournament" class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                <i class="fa fa-calendar text-primary mr-3"></i>
+                                <span>赛事组织</span>
+                            </label>
+                        </div>
+                        
+                        <div class="relative">
+                            <input type="radio" id="category-newplayer" name="category" value="newplayer" class="peer sr-only" required>
+                            <label for="category-newplayer" class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                <i class="fa fa-graduation-cap text-primary mr-3"></i>
+                                <span>新手指导</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 群组描述 -->
+                <div>
+                    <label for="group-description" class="block text-sm font-medium text-gray-700 mb-2">群组描述</label>
+                    <textarea id="group-description" name="group-description" rows="4" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary" placeholder="请简要描述群组的主题和目的" required></textarea>
+                </div>
+                
+                <!-- 群组类型 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">群组类型</label>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <input id="group-type-public" name="group-type" type="radio" value="public" class="h-4 w-4 text-primary focus:ring-primary border-gray-300" checked>
+                            <label for="group-type-public" class="ml-2 block text-sm text-gray-700">公开群组 - 任何人都可以查看和申请加入</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input id="group-type-private" name="group-type" type="radio" value="private" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+                            <label for="group-type-private" class="ml-2 block text-sm text-gray-700">私密群组 - 只有邀请才能加入</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 提交按钮 -->
+                <div class="pt-4 flex space-x-4">
+                    <button type="button" id="cancel-create-group" class="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors">
+                        取消
+                    </button>
+                    <button type="submit" class="w-1/2 bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all">
+                        创建群组
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-12 pb-6">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">高能英雄社区</h3>
+                    <p class="text-gray-400 mb-4">
+                        为游戏玩家打造的专业社区，分享游戏经验，结交游戏好友。
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-wechat text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                navbar.classList.add('bg-white', 'shadow-md');
+                navbar.classList.remove('bg-glass');
+            } else {
+                navbar.classList.remove('bg-white', 'shadow-md');
+                navbar.classList.add('bg-glass');
+            }
+        });
+        
+        // 移动端菜单切换
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // 我的群组侧边栏
+        const myGroupsSidebar = document.getElementById('my-groups-sidebar');
+        const showMyGroupsBtn = document.getElementById('show-my-groups');
+        const mobileShowMyGroupsBtn = document.getElementById('mobile-show-my-groups');
+        const closeMyGroupsBtn = document.getElementById('close-my-groups');
+        const overlay = document.getElementById('overlay');
+        
+        function toggleMyGroupsSidebar() {
+            myGroupsSidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+            
+            // 更新我的群组列表
+            updateMyGroupsList();
+        }
+        
+        showMyGroupsBtn.addEventListener('click', toggleMyGroupsSidebar);
+        mobileShowMyGroupsBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            toggleMyGroupsSidebar();
+        });
+        closeMyGroupsBtn.addEventListener('click', toggleMyGroupsSidebar);
+        overlay.addEventListener('click', () => {
+            myGroupsSidebar.classList.add('-translate-x-full');
+            chatModal.classList.add('hidden');
+            createGroupModal.classList.add('hidden');
+            overlay.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        });
+        
+        // 加入群组功能
+        document.querySelectorAll('.join-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const groupId = this.getAttribute('data-group-id');
+                const groupName = this.getAttribute('data-group-name');
+                
+                // 显示加载状态
+                this.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 加入中...';
+                this.disabled = true;
+                
+                // 模拟API请求延迟
+                setTimeout(() => {
+                    // 显示成功消息
+                    this.classList.remove('btn-join');
+                    this.classList.add('btn-joined');
+                    this.innerHTML = '<i class="fa fa-check mr-2"></i> 已加入';
+                    
+                    // 显示通知
+                    showNotification(`已成功加入群组 "${groupName}"`);
+                    
+                    // 保存已加入状态
+                    let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
+                    if (!myGroups.some(group => group.id === groupId)) {
+                        myGroups.push({
+                            id: groupId,
+                            name: groupName,
+                            members: Math.floor(Math.random() * 5000),
+                            lastMessage: '快来和大家一起聊天吧！',
+                            lastMessageTime: new Date().toISOString()
+                        });
+                        localStorage.setItem('myGroups', JSON.stringify(myGroups));
+                    }
+                }, 1000);
+            });
+            
+            // 检查是否已加入该群组
+            const groupId = button.getAttribute('data-group-id');
+            const groupName = button.getAttribute('data-group-name');
+            let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
+            if (myGroups.some(group => group.id === groupId)) {
+                button.classList.remove('btn-join');
+                button.classList.add('btn-joined');
+                button.innerHTML = '<i class="fa fa-check mr-2"></i> 已加入';
+                button.disabled = true;
+            }
+        });
+        
+        // 更新我的群组列表 - 修复闭包问题
+        function updateMyGroupsList() {
+            const myGroupsList = document.getElementById('my-groups-list');
+            const myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
+            
+            if (myGroups.length === 0) {
+                myGroupsList.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <i class="fa fa-folder-open-o text-4xl mb-3"></i>
+                        <p>您还没有加入任何群组</p>
+                        <p class="text-sm">加入或创建群组开始聊天</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            myGroupsList.innerHTML = '';
+            
+            myGroups.forEach(group => {
+                const groupEl = document.createElement('div');
+                groupEl.className = 'mb-3 cursor-pointer hover:bg-gray-50 rounded-lg p-3 transition-colors';
+                groupEl.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                            <i class="fa fa-users text-primary"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <h4 class="font-medium">${group.name}</h4>
+                                <span class="text-xs text-gray-500">${formatTimeAgo(group.lastMessageTime)}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-1">${group.lastMessage}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // 修复闭包问题 - 使用箭头函数和立即执行函数
+                groupEl.addEventListener('click', () => {
+                    // 先关闭侧边栏
+                    myGroupsSidebar.classList.add('-translate-x-full');
+                    // 然后打开聊天窗口，添加延迟确保动画完成
+                    setTimeout(() => {
+                        openChatModal(group);
+                    }, 300);
+                });
+                
+                myGroupsList.appendChild(groupEl);
+            });
+        }
+        
+        // 聊天模态框
+        const chatModal = document.getElementById('chat-modal');
+        const chatModalContent = document.getElementById('chat-modal-content');
+        const closeChatModalBtn = document.getElementById('close-chat-modal');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatMessageBtn = document.getElementById('send-chat-message');
+        const chatGroupName = document.getElementById('chat-group-name');
+        const chatGroupMembers = document.getElementById('chat-group-members');
+        
+        function openChatModal(group) {
+            // 确保我们有正确的群组数据
+            if (!group || !group.name) {
+                console.error('无效的群组数据', group);
+                showNotification('无法加载群组信息');
+                return;
+            }
+            
+            // 设置聊天窗口标题和成员数
+            chatGroupName.textContent = group.name;
+            chatGroupMembers.textContent = `${group.members} 成员`;
+            
+            // 显示聊天消息
+            displayChatMessages(group.id);
+            
+            // 显示聊天窗口并添加动画
+            chatModal.classList.remove('hidden');
+            setTimeout(() => {
+                chatModalContent.classList.remove('scale-95', 'opacity-0');
+                chatModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            overlay.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            
+            // 自动聚焦到输入框
+            setTimeout(() => {
+                chatInput.focus();
+            }, 300);
+        }
+        
+        function closeChatModal() {
+            chatModalContent.classList.remove('scale-100', 'opacity-100');
+            chatModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                chatModal.classList.add('hidden');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }, 300);
+        }
+        
+        closeChatModalBtn.addEventListener('click', closeChatModal);
+        
+        // 发送聊天消息
+        sendChatMessageBtn.addEventListener('click', () => {
+            sendMessage();
+        });
+        
+        // 回车发送消息
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // 发送消息函数
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message === '') return;
+            
+            // 获取当前活跃的群组名称
+            const groupName = chatGroupName.textContent;
+            let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
+            const activeGroup = myGroups.find(group => group.name === groupName);
+            
+            if (activeGroup) {
+                // 更新最后一条消息
+                activeGroup.lastMessage = message;
+                activeGroup.lastMessageTime = new Date().toISOString();
+                localStorage.setItem('myGroups', JSON.stringify(myGroups));
+                
+                // 添加消息到聊天窗口
+                addMessageToChat('right', '奶龙', message);
+                
+                // 模拟回复
+                setTimeout(() => {
+                    const replies = [
+                        '哈哈，这个游戏真不错！',
+                        '我也很喜欢这个英雄的玩法',
+                        '有没有人一起组队啊？',
+                        '明天有比赛，大家准备好！',
+                        '这个策略很有意思，值得尝试'
+                    ];
+                    const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                    addMessageToChat('left', '玩家' + Math.floor(Math.random() * 1000), randomReply);
+                    
+                    // 更新最后一条消息
+                    activeGroup.lastMessage = randomReply;
+                    activeGroup.lastMessageTime = new Date().toISOString();
+                    localStorage.setItem('myGroups', JSON.stringify(myGroups));
+                    
+                    // 更新我的群组列表中的最后一条消息
+                    updateMyGroupsList();
+                }, 1000);
+            }
+            
+            // 清空输入框
+            chatInput.value = '';
+        }
+        
+        // 添加消息到聊天窗口
+        function addMessageToChat(side, username, message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${side === 'right' ? 'justify-end' : 'justify-start'}`;
+            
+            // 生成头像颜色
+            const colors = ['blue', 'green', 'purple', 'red', 'orange', 'indigo', 'pink'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 生成首字母
+            const firstChar = username.charAt(0).toUpperCase();
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble ${side === 'right' ? 'message-bubble-right' : 'message-bubble-left'}">
+                    ${side === 'left' ? `
+                        <div class="flex items-center mb-1">
+                            <div class="w-6 h-6 rounded-full bg-${randomColor}-500 text-white flex items-center justify-center text-xs mr-2">
+                                ${firstChar}
+                            </div>
+                            <span class="text-xs font-medium">${username}</span>
+                        </div>
+                    ` : ''}
+                    <p>${message}</p>
+                    ${side === 'right' ? `
+                        <div class="text-right mt-1">
+                            <span class="text-xs text-white/80">刚刚</span>
+                        </div>
+                    ` : `
+                        <div class="text-right mt-1">
+                            <span class="text-xs text-gray-500">刚刚</span>
+                        </div>
+                    `}
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // 滚动到底部
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // 显示聊天消息
+        function displayChatMessages(groupId) {
+            // 清空聊天窗口
+            chatMessages.innerHTML = '';
+            
+            // 模拟一些历史消息
+            const messageCount = Math.floor(Math.random() * 5) + 1;
+            const usernames = ['玩家1', '玩家2', '玩家3', '玩家4', '玩家5'];
+            const messages = [
+                '大家好，欢迎加入这个群组！',
+                '有人一起组队玩吗？',
+                '这个游戏的新英雄太强了！',
+                '请问这个副本怎么打？',
+                '明天有活动，记得参加哦！',
+                '我觉得这个策略很不错',
+                '有人知道下个版本更新什么吗？'
+            ];
+            
+            for (let i = 0; i < messageCount; i++) {
+                const username = usernames[Math.floor(Math.random() * usernames.length)];
+                const message = messages[Math.floor(Math.random() * messages.length)];
+                const side = i % 2 === 0 ? 'left' : 'right';
+                
+                // 随机延迟添加消息，模拟聊天过程
+                setTimeout(() => {
+                    addMessageToChat(side, username, message);
+                }, i * 200);
+            }
+        }
+        
+        // 格式化时间
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const date = new Date(timestamp);
+            const diff = now - date;
+            
+            if (diff < 60000) { // 不到1分钟
+                return '刚刚';
+            } else if (diff < 3600000) { // 不到1小时
+                return Math.floor(diff / 60000) + '分钟前';
+            } else if (diff < 86400000) { // 不到1天
+                return Math.floor(diff / 3600000) + '小时前';
+            } else {
+                return date.getMonth() + 1 + '月' + date.getDate() + '日';
+            }
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-500 z-50';
+            notification.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(notification);
+            
+            // 显示通知
+            setTimeout(() => {
+                notification.classList.remove('translate-y-10', 'opacity-0');
+            }, 100);
+            
+            // 3秒后隐藏通知
+            setTimeout(() => {
+                notification.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
+        }
+        
+        // 创建群组功能
+        const createGroupBtn = document.getElementById('create-group-btn');
+        const createGroupBtnSidebar = document.getElementById('create-group-btn-sidebar');
+        const createGroupModal = document.getElementById('create-group-modal');
+        const createModalContent = document.getElementById('create-modal-content');
+        const closeCreateModalBtn = document.getElementById('close-create-modal');
+        const cancelCreateGroupBtn = document.getElementById('cancel-create-group');
+        const createGroupForm = document.getElementById('create-group-form');
+        
+        function openCreateGroupModal() {
+            createGroupModal.classList.remove('hidden');
+            setTimeout(() => {
+                createModalContent.classList.remove('scale-95', 'opacity-0');
+                createModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            overlay.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+        
+        function closeCreateGroupModal() {
+            createModalContent.classList.remove('scale-100', 'opacity-100');
+            createModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                createGroupModal.classList.add('hidden');
+                overlay.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }, 300);
+        }
+        
+        createGroupBtn.addEventListener('click', openCreateGroupModal);
+        createGroupBtnSidebar.addEventListener('click', openCreateGroupModal);
+        closeCreateModalBtn.addEventListener('click', closeCreateGroupModal);
+        cancelCreateGroupBtn.addEventListener('click', closeCreateGroupModal);
+        
+        // 处理创建群组表单提交
+        createGroupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const groupName = document.getElementById('group-name').value;
+            const categoryElements = document.getElementsByName('category');
+            let category = '';
+            
+            for (const el of categoryElements) {
+                if (el.checked) {
+                    category = el.value;
+                    break;
+                }
+            }
+            
+            const groupDescription = document.getElementById('group-description').value;
+            const groupType = document.querySelector('input[name="group-type"]:checked').value;
+            
+            // 显示加载状态
+            const submitButton = createGroupForm.querySelector('button[type="submit"]');
+            submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 创建中...';
+            submitButton.disabled = true;
+            
+            // 模拟API请求延迟
+            setTimeout(() => {
+                // 创建新群组
+                const newGroup = {
+                    id: Date.now().toString(),
+                    name: groupName,
+                    members: 1, // 创建者本人
+                    lastMessage: '群组已创建',
+                    lastMessageTime: new Date().toISOString(),
+                    category: category,
+                    description: groupDescription,
+                    type: groupType
+                };
+                
+                // 保存到localStorage
+                let myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
+                myGroups.push(newGroup);
+                localStorage.setItem('myGroups', JSON.stringify(myGroups));
+                
+                // 关闭模态框
+                closeCreateGroupModal();
+                
+                // 显示成功通知
+                showNotification(`群组 "${groupName}" 创建成功！`);
+                
+                // 更新我的群组列表
+                updateMyGroupsList();
+                
+                // 重置表单
+                createGroupForm.reset();
+                
+                // 恢复按钮状态
+                setTimeout(() => {
+                    submitButton.innerHTML = '创建群组';
+                    submitButton.disabled = false;
+                }, 300);
+            }, 1500);
+        });
+        
+        // 初始化我的群组列表
+        updateMyGroupsList();
+    </script>
+</body>
+</html>    
