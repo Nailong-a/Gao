@@ -11,6 +11,77 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script>
+        // 群组数据管理
+        const GroupManager = {
+            // 获取所有群组
+            getAllGroups() {
+                return JSON.parse(localStorage.getItem('groups') || '[]');
+            },
+            
+            // 获取我的群组
+            getMyGroups() {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                const userId = userInfo.username || 'default';
+                return this.getAllGroups().filter(group => 
+                    group.members && group.members.includes(userId)
+                );
+            },
+            
+            // 创建新群组
+            createGroup(groupData) {
+                const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                const userId = userInfo.username || 'default';
+                
+                const newGroup = {
+                    id: Date.now().toString(),
+                    name: groupData.name,
+                    category: groupData.category,
+                    description: groupData.description,
+                    type: groupData.type,
+                    createdAt: new Date().toISOString(),
+                    members: [userId], // 创建者自动加入
+                    creator: userId
+                };
+                
+                const groups = this.getAllGroups();
+                groups.push(newGroup);
+                localStorage.setItem('groups', JSON.stringify(groups));
+                
+                return newGroup;
+            },
+            
+            // 渲染我的群组列表
+            renderMyGroups() {
+                const myGroupsList = document.getElementById('my-groups-list');
+                const myGroups = this.getMyGroups();
+                
+                if (myGroups.length === 0) {
+                    myGroupsList.innerHTML = `
+                        <div class="text-center text-gray-500 py-8">
+                            <i class="fa fa-folder-open-o text-4xl mb-3"></i>
+                            <p>您还没有加入任何群组</p>
+                            <p class="text-sm">加入或创建群组开始聊天</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                myGroupsList.innerHTML = myGroups.map(group => `
+                    <div class="group-item bg-gray-50 rounded-lg p-3 mb-3 cursor-pointer hover:bg-gray-100 transition-colors" data-group-id="${group.id}">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fa fa-users text-primary"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">${group.name}</h4>
+                                <p class="text-xs text-gray-500">${group.members.length} 成员</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        };
+        
         tailwind.config = {
             theme: {
                 extend: {
@@ -26,6 +97,49 @@
                 },
             }
         }
+        // 创建群组表单处理
+        document.getElementById('create-group-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitButton = document.getElementById('submit-create-group');
+            const submitText = document.getElementById('submit-button-text');
+            const submitSpinner = document.getElementById('submit-spinner');
+            
+            // 显示加载状态
+            submitButton.disabled = true;
+            submitText.textContent = '创建中';
+            submitSpinner.classList.remove('hidden');
+            
+            // 获取表单数据
+            const groupData = {
+                name: document.getElementById('group-name').value,
+                category: document.querySelector('input[name="category"]:checked').value,
+                description: document.getElementById('group-description').value,
+                type: document.querySelector('input[name="group-type"]:checked').value
+            };
+            
+            // 创建群组
+            const newGroup = GroupManager.createGroup(groupData);
+            
+            // 模拟网络延迟
+            setTimeout(() => {
+                // 更新我的群组列表
+                GroupManager.renderMyGroups();
+                
+                // 重置表单
+                this.reset();
+                
+                // 关闭模态框
+                document.getElementById('create-group-modal').classList.add('hidden');
+                document.getElementById('create-modal-content').classList.remove('scale-100', 'opacity-100');
+                document.getElementById('create-modal-content').classList.add('scale-95', 'opacity-0');
+                
+                // 恢复按钮状态
+                submitButton.disabled = false;
+                submitText.textContent = '创建群组';
+                submitSpinner.classList.add('hidden');
+            }, 800);
+        });
     </script>
     
     <style type="text/tailwindcss">
@@ -99,8 +213,8 @@
                             <span class="text-sm font-medium">我的群组</span>
                         </button>
                         <a href="profile.html" class="hidden md:flex items-center space-x-2">
-                            <img src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
-                            <span class="text-sm font-medium">奶龙</span>
+                            <img id="user-avatar" src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
+                            <span id="username-display" class="text-sm font-medium">奶龙</span>
                         </a>
                         
                         <!-- 移动端菜单按钮 -->
@@ -123,8 +237,8 @@
                 </button>
                 <a href="profile.html" class="text-gray-900 hover:text-primary block px-3 py-2 text-base font-medium">
                     <div class="flex items-center space-x-2">
-                        <img src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
-                        <span>奶龙</span>
+                        <img id="mobile-user-avatar" src="https://picsum.photos/id/237/40/40" alt="用户头像" class="h-8 w-8 rounded-full object-cover">
+                        <span id="mobile-username">奶龙</span>
                     </div>
                 </a>
             </div>
@@ -395,8 +509,8 @@
 
     <script>
         // 导航栏滚动效果
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
             if (window.scrollY > 10) {
                 navbar.classList.add('bg-white', 'shadow-md');
                 navbar.classList.remove('bg-glass');
@@ -405,358 +519,268 @@
                 navbar.classList.add('bg-glass');
             }
         });
-        
+
         // 移动端菜单切换
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-        mobileMenuButton.addEventListener('click', () => {
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         });
+
+        // 加载用户信息和群组
+        GroupManager.renderMyGroups();
         
-        // 我的群组侧边栏
+        // 侧边栏显示/隐藏逻辑
         const myGroupsSidebar = document.getElementById('my-groups-sidebar');
-        const showMyGroupsBtn = document.getElementById('show-my-groups');
-        const mobileShowMyGroupsBtn = document.getElementById('mobile-show-my-groups');
-        const closeMyGroupsBtn = document.getElementById('close-my-groups');
         const overlay = document.getElementById('overlay');
         
-        function toggleMyGroupsSidebar() {
-            myGroupsSidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-            document.body.classList.toggle('overflow-hidden');
-            
-            // 更新我的群组列表
-            updateMyGroupsList();
+        // 显示侧边栏
+        function showSidebar() {
+            myGroupsSidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
         
-        showMyGroupsBtn.addEventListener('click', toggleMyGroupsSidebar);
-        mobileShowMyGroupsBtn.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            toggleMyGroupsSidebar();
-        });
-        closeMyGroupsBtn.addEventListener('click', toggleMyGroupsSidebar);
-        overlay.addEventListener('click', () => {
+        // 隐藏侧边栏
+        function hideSidebar() {
             myGroupsSidebar.classList.add('-translate-x-full');
-            chatModal.classList.add('hidden');
-            createGroupModal.classList.add('hidden');
             overlay.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
+            document.body.style.overflow = '';
+        }
+        
+        // 绑定侧边栏显示事件
+        document.getElementById('show-my-groups')?.addEventListener('click', showSidebar);
+        document.getElementById('mobile-show-my-groups')?.addEventListener('click', showSidebar);
+        
+        // 绑定侧边栏隐藏事件
+        document.getElementById('close-my-groups')?.addEventListener('click', hideSidebar);
+        overlay?.addEventListener('click', hideSidebar);
+        
+        // 群聊项点击事件委托
+        document.getElementById('my-groups-list')?.addEventListener('click', function(e) {
+            const groupItem = e.target.closest('.group-item');
+            if (groupItem) {
+                const groupId = groupItem.dataset.groupId;
+                const groupName = groupItem.querySelector('h4').textContent;
+                const memberCount = groupItem.querySelector('p').textContent;
+                
+                // 设置聊天模态框信息
+                document.getElementById('chat-group-name').textContent = groupName;
+                document.getElementById('chat-group-members').textContent = memberCount;
+                
+                // 显示聊天模态框
+                const chatModal = document.getElementById('chat-modal');
+                const chatModalContent = document.getElementById('chat-modal-content');
+                
+                chatModal.classList.remove('hidden');
+                setTimeout(() => {
+                    chatModalContent.classList.remove('scale-95', 'opacity-0');
+                    chatModalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+                
+                hideSidebar();
+            }
         });
         
-        // 更新我的群组列表 - 修复闭包问题
-        function updateMyGroupsList() {
-            const myGroupsList = document.getElementById('my-groups-list');
-            const myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
-            
-            if (myGroups.length === 0) {
-                myGroupsList.innerHTML = `
-                    <div class="text-center text-gray-500 py-8">
-                        <i class="fa fa-folder-open-o text-4xl mb-3"></i>
-                        <p>您还没有加入任何群组</p>
-                        <p class="text-sm">加入或创建群组开始聊天</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            myGroupsList.innerHTML = '';
-            
-            myGroups.forEach(group => {
-                const groupEl = document.createElement('div');
-                groupEl.className = 'mb-3 cursor-pointer hover:bg-gray-50 rounded-lg p-3 transition-colors';
-                groupEl.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fa fa-users text-primary"></i>
-                        </div>
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <h4 class="font-medium">${group.name}</h4>
-                                <span class="text-xs text-gray-500">${formatTimeAgo(group.lastMessageTime)}</span>
-                            </div>
-                            <p class="text-sm text-gray-600 line-clamp-1">${group.lastMessage}</p>
-                        </div>
-                    </div>
-                `;
+        // 创建群聊模态框逻辑
+        const createGroupModal = document.getElementById('create-group-modal');
+        const createGroupModalContent = document.getElementById('create-group-modal-content');
+        const createGroupForm = document.getElementById('create-group-form');
+        
+        // 显示创建群聊模态框
+        function showCreateGroupModal() {
+            createGroupModal.classList.remove('hidden');
+            setTimeout(() => {
+                createGroupModalContent.classList.remove('scale-95', 'opacity-0');
+                createGroupModalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        
+        // 隐藏创建群聊模态框
+        function hideCreateGroupModal() {
+            createGroupModalContent.classList.remove('scale-100', 'opacity-100');
+            createGroupModalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                createGroupModal.classList.add('hidden');
+            }, 200);
+        }
+        
+        // 绑定创建群聊按钮事件
+        document.getElementById('create-group-btn')?.addEventListener('click', showCreateGroupModal);
+        document.getElementById('close-create-group')?.addEventListener('click', hideCreateGroupModal);
+        document.getElementById('cancel-create-group')?.addEventListener('click', hideCreateGroupModal);
+        
+        // 处理创建群聊表单提交
+        if (createGroupForm) {
+            createGroupForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const groupName = document.getElementById('group-name-input').value.trim();
                 
-                // 修复闭包问题 - 使用箭头函数
-                groupEl.addEventListener('click', () => {
-                    // 先关闭侧边栏
-                    myGroupsSidebar.classList.add('-translate-x-full');
-                    // 然后打开聊天窗口，添加延迟确保动画完成
-                    setTimeout(() => {
-                        openChatModal(group);
-                    }, 300);
-                });
-                
-                myGroupsList.appendChild(groupEl);
+                if (groupName) {
+                    console.log('开始处理创建群组请求:', groupName);
+                    
+                    // 获取提交按钮并检查
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    console.log('找到提交按钮:', submitBtn);
+                    if (!submitBtn) {
+                        console.error('未找到提交按钮，终止操作');
+                        return;
+                    }
+                    
+                    const originalText = submitBtn.textContent;
+                    try {
+                        console.log('设置按钮加载状态');
+                        // 添加加载状态
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = '创建中...';
+
+                        // 验证群组名称
+                        console.log('验证群组名称');
+                        if (!groupName.trim()) {
+                            throw new Error('群组名称不能为空');
+                        }
+
+                        // 使用Web Worker执行群组创建，避免阻塞主线程
+                        console.log('使用Web Worker创建群组:', groupName);
+                        console.time('createGroup');
+                        
+                        // 创建Web Worker
+                        const groupWorker = new Worker(URL.createObjectURL(new Blob([`
+                            self.onmessage = function(e) {
+                                const groupName = e.data;
+                                try {
+                                    // 导入GroupManager并执行实际创建逻辑
+                                    importScripts('/js/group-manager.js');
+                                    const newGroup = await GroupManager.createGroup(groupName);
+                                    
+                                    self.postMessage({ success: true, data: newGroup });
+                                } catch (error) {
+                                    self.postMessage({ success: false, error: error.message });
+                                }
+                                self.close();
+                            };
+                        `], { type: 'application/javascript' })));
+                        
+                        // 使用Promise包装Worker通信
+                        const newGroup = await new Promise((resolve, reject) => {
+                            // 超时处理
+                            const timeout = setTimeout(() => {
+                                reject(new Error('创建群组超时，请重试'));
+                                groupWorker.terminate();
+                            }, 5000);
+                            
+                            // 接收Worker消息
+                            groupWorker.onmessage = function(e) {
+                                clearTimeout(timeout);
+                                if (e.data.success) {
+                                    resolve(e.data.data);
+                                } else {
+                                    reject(new Error(e.data.error));
+                                }
+                            };
+                            
+                            // 发送数据到Worker
+                            groupWorker.postMessage(groupName);
+                        });
+                        
+                        console.timeEnd('createGroup');
+                        console.log('Web Worker创建群组完成:', newGroup);
+                        
+                        if (!newGroup) {
+                            throw new Error('创建群组失败，请重试');
+                        }
+
+                        // 延迟刷新群组列表，避免阻塞UI
+                        console.log('安排刷新群组列表');
+                        // 使用requestIdleCallback延迟非关键渲染任务
+                        // 使用setTimeout确保渲染及时执行，避免界面卡住
+                        console.log('安排刷新群组列表');
+                        setTimeout(() => {
+                            try {
+                                GroupManager.renderMyGroups();
+                                console.log('群组列表刷新完成');
+                            } catch (renderError) {
+                                console.error('渲染群组列表失败:', renderError);
+                                // 显示渲染错误通知
+                                const errorNotification = document.createElement('div');
+                                errorNotification.textContent = '刷新群组列表失败: ' + renderError.message;
+                                errorNotification.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#f44336;color:white;padding:15px 20px;border-radius:4px;z-index:1000;transition:opacity 0.3s;';
+                                document.body.appendChild(errorNotification);
+                                setTimeout(() => {
+                                    errorNotification.style.opacity = '0';
+                                    setTimeout(() => document.body.removeChild(errorNotification), 300);
+                                }, 3000);
+                            }
+                        }, 100); // 短暂延迟确保UI线程空闲
+
+                        // 优化UI操作流程，添加详细计时
+                        (async () => {
+                            try {
+                                console.time('hideModal');
+                                hideCreateGroupModal();
+                                console.timeEnd('hideModal');
+
+                                // 等待模态框过渡动画完成
+                                await new Promise(resolve => setTimeout(resolve, 300));
+
+                                console.time('resetForm');
+                                createGroupForm.reset();
+                                console.timeEnd('resetForm');
+
+                                console.time('showNotification');
+                                // 创建非阻塞通知元素
+                                const notification = document.createElement('div');
+                                notification.textContent = '群组创建成功！';
+                                notification.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#4CAF50;color:white;padding:15px 20px;border-radius:4px;z-index:1000;transition:opacity 0.3s;';
+                                document.body.appendChild(notification);
+                                
+                                // 3秒后自动移除
+                                setTimeout(() => {
+                                    notification.style.opacity = '0';
+                                    setTimeout(() => {
+                                        document.body.removeChild(notification);
+                                        console.timeEnd('showNotification');
+                                    }, 300);
+                                }, 3000);
+                            } catch (error) {
+                                console.error('UI操作执行错误:', error);
+                                throw error; // 重新抛出错误以确保外层catch能捕获
+                            }
+                        })();
+                    } catch (error) {
+                        console.error('创建群组过程中捕获错误:', error);
+                        alert('创建群组时出错: ' + error.message);
+                    } finally {
+                        console.log('恢复按钮原始状态');
+                        // 恢复按钮状态
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                    
+                    console.log('创建群组流程完全结束');
+                } else {
+                    console.log('群组名称为空，不执行创建操作');
+                }
             });
         }
         
-        // 聊天模态框
-        const chatModal = document.getElementById('chat-modal');
-        const chatModalContent = document.getElementById('chat-modal-content');
-        const closeChatModalBtn = document.getElementById('close-chat-modal');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInput = document.getElementById('chat-input');
-        const sendChatMessageBtn = document.getElementById('send-chat-message');
-        const chatGroupName = document.getElementById('chat-group-name');
-        const chatGroupMembers = document.getElementById('chat-group-members');
-        
-        function openChatModal(group) {
-            // 确保我们有正确的群组数据
-            if (!group || !group.name) {
-                console.error('无效的群组数据', group);
-                showNotification('无法加载群组信息');
-                return;
-            }
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInfo = JSON.parse(localStorage.getItem('userInfo')) || {
+                username: '奶龙',
+                avatar: 'https://picsum.photos/id/237/40/40'
+            };
             
-            // 设置聊天窗口标题和成员数
-            chatGroupName.textContent = group.name;
-            chatGroupMembers.textContent = `${group.members} 成员`;
+            const avatarElement = document.getElementById('user-avatar');
+            const usernameElement = document.getElementById('username-display');
             
-            // 显示聊天消息
-            displayChatMessages(group.id);
+            if (avatarElement) avatarElement.src = userInfo.avatar;
+            if (usernameElement) usernameElement.textContent = userInfo.username;
             
-            // 显示聊天窗口并添加动画
-            chatModal.classList.remove('hidden');
-            setTimeout(() => {
-                chatModalContent.classList.remove('scale-95', 'opacity-0');
-                chatModalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            
-            overlay.classList.remove('hidden');
-            document.body.classList.add('overflow-hidden');
-            
-            // 自动聚焦到输入框
-            setTimeout(() => {
-                chatInput.focus();
-            }, 300);
-        }
-        
-        function closeChatModal() {
-            chatModalContent.classList.remove('scale-100', 'opacity-100');
-            chatModalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                chatModal.classList.add('hidden');
-                overlay.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
-            }, 300);
-        }
-        
-        closeChatModalBtn.addEventListener('click', closeChatModal);
-        
-        // 发送聊天消息
-        sendChatMessageBtn.addEventListener('click', () => {
-            const message = chatInput.value.trim();
-            if (message === '') return;
-            
-            // 添加消息到界面
-            const messageElement = document.createElement('div');
-            messageElement.className = 'message-bubble message-bubble-right';
-            messageElement.textContent = message;
-            
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // 清空输入框
-            chatInput.value = '';
-            
-            // 模拟发送到服务器
-            console.log(`发送消息到群组: ${chatGroupName.textContent}, 内容: ${message}`);
-            
-            // 更新最后一条消息
-            const myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
-            const groupIndex = myGroups.findIndex(g => g.name === chatGroupName.textContent);
-            if (groupIndex !== -1) {
-                myGroups[groupIndex].lastMessage = message;
-                myGroups[groupIndex].lastMessageTime = new Date().toISOString();
-                localStorage.setItem('myGroups', JSON.stringify(myGroups));
-            }
-            
-            // 模拟服务器回复
-            setTimeout(() => {
-                const replyElement = document.createElement('div');
-                replyElement.className = 'message-bubble message-bubble-left';
-                replyElement.innerHTML = `<div class="font-medium text-gray-900">系统</div>${message}`;
-                
-                chatMessages.appendChild(replyElement);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1000);
+            // 移动端头像和用户名
+            const mobileAvatar = document.getElementById('mobile-user-avatar');
+            const mobileUsername = document.getElementById('mobile-username');
+            if (mobileAvatar) mobileAvatar.src = userInfo.avatar;
+            if (mobileUsername) mobileUsername.textContent = userInfo.username;
         });
-
-        // 创建群组模态框
-        const createGroupModal = document.getElementById('create-group-modal');
-        const createModalContent = document.getElementById('create-modal-content');
-        const createGroupBtn = document.getElementById('create-group-btn');
-        const createGroupBtnSidebar = document.getElementById('create-group-btn-sidebar');
-        const closeCreateModalBtn = document.getElementById('close-create-modal');
-        const cancelCreateGroupBtn = document.getElementById('cancel-create-group');
-        const createGroupForm = document.getElementById('create-group-form');
-        const submitCreateGroupBtn = document.getElementById('submit-create-group');
-        const submitButtonText = document.getElementById('submit-button-text');
-        const submitSpinner = document.getElementById('submit-spinner');
-        
-        function openCreateGroupModal() {
-            createGroupModal.classList.remove('hidden');
-            setTimeout(() => {
-                createModalContent.classList.remove('scale-95', 'opacity-0');
-                createModalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-            
-            overlay.classList.remove('hidden');
-            document.body.classList.add('overflow-hidden');
-        }
-        
-        function closeCreateGroupModal() {
-            createModalContent.classList.remove('scale-100', 'opacity-100');
-            createModalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                createGroupModal.classList.add('hidden');
-                overlay.classList.add('hidden');
-                document.body.classList.remove('overflow-hidden');
-            }, 300);
-        }
-        
-        createGroupBtn.addEventListener('click', openCreateGroupModal);
-        createGroupBtnSidebar.addEventListener('click', openCreateGroupModal);
-        closeCreateModalBtn.addEventListener('click', closeCreateGroupModal);
-        cancelCreateGroupBtn.addEventListener('click', closeCreateGroupModal);
-        
-        // 创建群组表单提交处理
-        createGroupForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // 验证表单数据
-            const groupName = document.getElementById('group-name').value.trim();
-            if (!groupName) {
-                showNotification('请输入群组名称');
-                return;
-            }
-            
-            const categoryElements = document.getElementsByName('category');
-            let categorySelected = false;
-            for (const el of categoryElements) {
-                if (el.checked) {
-                    categorySelected = true;
-                    break;
-                }
-            }
-            if (!categorySelected) {
-                showNotification('请选择群组类别');
-                return;
-            }
-            
-            const groupDescription = document.getElementById('group-description').value.trim();
-            if (!groupDescription) {
-                showNotification('请输入群组描述');
-                return;
-            }
-            
-            // 显示加载状态
-            submitButtonText.textContent = '创建中...';
-            submitSpinner.classList.remove('hidden');
-            submitCreateGroupBtn.disabled = true;
-            
-            try {
-                // 获取表单数据
-                const category = Array.from(categoryElements).find(el => el.checked).value;
-                const groupType = Array.from(document.getElementsByName('group-type')).find(el => el.checked).value;
-                
-                // 构建请求数据
-                const groupData = {
-                    id: Date.now().toString(), // 生成唯一ID
-                    name: groupName,
-                    category: category,
-                    description: groupDescription,
-                    type: groupType,
-                    creatorId: 'user123', // 示例用户ID，实际应从会话中获取
-                    createdAt: new Date().toISOString(),
-                    members: 1, // 创建者自己
-                    lastMessage: '欢迎加入群组！',
-                    lastMessageTime: new Date().toISOString()
-                };
-                
-                // 模拟API调用 - 使用localStorage代替真实API
-                // 实际应用中，这里应该有API调用将数据发送到服务器
-                // 模拟延迟
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                // 更新我的群组列表
-                const myGroups = JSON.parse(localStorage.getItem('myGroups')) || [];
-                myGroups.push(groupData);
-                localStorage.setItem('myGroups', JSON.stringify(myGroups));
-                
-                // 成功创建群组后处理
-                showNotification('群组创建成功！');
-                
-                // 关闭模态框
-                closeCreateGroupModal();
-                
-                // 重置表单
-                createGroupForm.reset();
-                
-                // 刷新我的群组列表
-                updateMyGroupsList();
-                
-                // 自动打开新创建的群组聊天窗口
-                setTimeout(() => {
-                    openChatModal(groupData);
-                }, 500);
-                
-            } catch (error) {
-                console.error('创建群组失败:', error);
-                showNotification('创建群组失败，请重试');
-            } finally {
-                // 恢复按钮状态
-                submitButtonText.textContent = '创建群组';
-                submitSpinner.classList.add('hidden');
-                submitCreateGroupBtn.disabled = false;
-            }
-        });
-
-        // 辅助函数
-        function formatTimeAgo(timestamp) {
-            const now = new Date();
-            const messageDate = new Date(timestamp);
-            const diff = now - messageDate;
-            const minutes = Math.floor(diff / 60000);
-            const hours = Math.floor(minutes / 60);
-            const days = Math.floor(hours / 24);
-
-            if (minutes < 1) {
-                return '刚刚';
-            } else if (minutes < 60) {
-                return `${minutes} 分钟前`;
-            } else if (hours < 24) {
-                return `${hours} 小时前`;
-            } else {
-                return `${days} 天前`;
-            }
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 bg-primary text-white p-3 rounded-lg shadow-md z-50';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function displayChatMessages(groupId) {
-            // 假设这里有获取聊天消息的逻辑
-            chatMessages.innerHTML = `
-                <div class="flex items-center justify-center h-full">
-                    <div class="text-center text-gray-500">
-                        <i class="fa fa-comments-o text-4xl mb-3"></i>
-                        <p>开始与群组成员聊天</p>
-                    </div>
-                </div>
-            `;
-        }
     </script>
 </body>
 </html>
